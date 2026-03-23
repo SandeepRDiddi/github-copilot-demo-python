@@ -3,6 +3,22 @@
 This project is a starter scaffold for running multiple integrations behind one Python MCP server.
 It now includes a production-ready baseline with startup validation, operational metadata, and a first usable local integration so you can run it immediately against your workspace.
 
+## How it works
+
+```mermaid
+flowchart LR
+    A["Engineer asks AI assistant a question"] --> B["AI client calls MCP tools"]
+    B --> C["MCP server receives request"]
+    C --> D["Safety and config layer validates access"]
+    D --> E["Workspace tools read project files"]
+    D --> F["Postgres tools run read-only queries"]
+    E --> G["Structured results returned to AI"]
+    F --> G
+    G --> H["AI explains issue, data, or next action"]
+```
+
+This is the core idea of the project: the AI does not directly touch everything on its own. It goes through one controlled MCP server that applies rules, limits, and safe integrations before returning useful answers.
+
 ## What this scaffold gives you
 
 - One `FastMCP` server process
