@@ -24,19 +24,19 @@ This is the core idea of the project: the AI does not directly touch everything 
 ### Story flow: missing invoices
 
 ```text
-Engineer: "A customer says their invoices are missing from the app."
+Engineer: "A customer says their invoices vanished from the app. We have a tiny billing mystery."
 
-AI Assistant: "Let me check the code path and the database safely through the MCP server."
+AI Assistant: "Detective mode on. I'll check the code path and the database safely through the MCP server."
 
-MCP Server: "I can inspect the workspace, look at the Postgres schema, and run read-only queries with limits."
+MCP Server: "I am the careful sidekick. I can inspect the workspace, look at the Postgres schema, and run read-only queries with limits."
 
-AI Assistant: "I found the invoice loading logic. The app only shows invoices where status = active."
+AI Assistant: "Clue #1: I found the invoice loading logic. The app only shows invoices where status = active."
 
-AI Assistant: "I also checked Postgres. The customer's invoices exist, but they are marked archived."
+AI Assistant: "Clue #2: I checked Postgres. The customer's invoices exist, but they are marked archived."
 
-Engineer: "So the data is there, but the app filter hides it."
+Engineer: "So the data is not missing. It is hiding behind a filter like a cat behind a curtain."
 
-AI Assistant: "Exactly. This looks like a business-rule or data-state issue, not a missing-record issue."
+AI Assistant: "Exactly. Case closed. This is a business-rule or data-state issue, not a missing-record issue."
 ```
 
 ### What happened behind the scenes
@@ -69,6 +69,8 @@ With this server:
 - access stays controlled and read-only where it matters
 - the engineer gets a faster explanation, not just raw data
 - the team gets a repeatable troubleshooting pattern instead of one-off scripts
+
+Small details like this matter because engineers remember systems that are both useful and pleasant to use. A little story helps the workflow stick in memory, which makes the technical value easier to explain and easier to adopt.
 
 ## What this scaffold gives you
 
