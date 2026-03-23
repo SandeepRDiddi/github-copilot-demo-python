@@ -1,0 +1,34 @@
+[project]
+name = "mcp-multi-server"
+version = "0.1.0"
+description = "Scaffold for a Python MCP server with multiple integrations."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "mcp[cli]>=1.0.0,<2.0.0",
+  "httpx>=0.27.0,<1.0.0",
+  "pydantic>=2.6.0,<3.0.0",
+  "pydantic-settings>=2.2.0,<3.0.0",
+  "psycopg[binary]>=3.1.0,<4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0,<9.0.0",
+]
+
+[project.scripts]
+mcp-multi-server = "app.server:main"
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
