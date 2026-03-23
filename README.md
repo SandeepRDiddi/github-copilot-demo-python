@@ -21,38 +21,54 @@ This is the core idea of the project: the AI does not directly touch everything 
 
 ## Real-world example
 
-Imagine an engineer gets a bug report:
+### Story flow: missing invoices
 
-`"Customer invoices are not showing in the app."`
+```text
+Engineer: "A customer says their invoices are missing from the app."
 
-Without a setup like this, the engineer usually has to:
+AI Assistant: "Let me check the code path and the database safely through the MCP server."
 
-- open the codebase and find where invoice data is loaded
-- connect to Postgres manually
-- inspect tables and schema
-- run SQL queries to check whether the data exists
-- compare the data with what the code expects
+MCP Server: "I can inspect the workspace, look at the Postgres schema, and run read-only queries with limits."
 
-With this MCP server, the flow is simpler and faster:
+AI Assistant: "I found the invoice loading logic. The app only shows invoices where status = active."
 
-1. The engineer asks the AI assistant to investigate why invoices are missing.
-2. The AI uses the workspace tools to inspect the code that loads invoice data.
-3. The AI uses the Postgres tools to safely inspect tables and run read-only queries.
-4. The MCP server applies limits, validation, and safe access rules before any result is returned.
-5. The AI combines the code context and database results into a clear explanation.
+AI Assistant: "I also checked Postgres. The customer's invoices exist, but they are marked archived."
 
-Example outcome:
+Engineer: "So the data is there, but the app filter hides it."
 
-The AI might discover that the invoices do exist in Postgres, but the app only shows invoices where `status = 'active'`, while this customer's records are marked `archived`.
+AI Assistant: "Exactly. This looks like a business-rule or data-state issue, not a missing-record issue."
+```
 
-That means the engineer gets the likely root cause quickly, without manually jumping between multiple systems.
+### What happened behind the scenes
 
-This is why the project exists:
+```mermaid
+sequenceDiagram
+    participant E as Engineer
+    participant A as AI Assistant
+    participant M as MCP Server
+    participant W as Workspace Tools
+    participant P as Postgres Tools
 
-- engineers spend less time gathering context
-- investigations become faster and more repeatable
-- database access is safer for AI-assisted workflows
-- teams get one reusable platform instead of one-off scripts
+    E->>A: "Why are invoices missing?"
+    A->>M: Request investigation
+    M->>W: Read invoice-related code files
+    W-->>M: Return code context
+    M->>P: Inspect schema and run read-only query
+    P-->>M: Return safe query results
+    M-->>A: Return structured findings
+    A-->>E: Explain root cause and next step
+```
+
+### Why this matters
+
+Without this server, an engineer often has to jump between code, database tools, and manual investigation steps.
+
+With this server:
+
+- the AI can gather code and database context in one place
+- access stays controlled and read-only where it matters
+- the engineer gets a faster explanation, not just raw data
+- the team gets a repeatable troubleshooting pattern instead of one-off scripts
 
 ## What this scaffold gives you
 
