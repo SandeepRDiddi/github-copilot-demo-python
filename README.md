@@ -66,6 +66,25 @@ Or use the installed console script:
 mcp-multi-server
 ```
 
+## CI and local stack
+
+GitHub Actions is configured in [.github/workflows/ci.yml](/Users/sandeepdiddi/Documents/New%20project/.github/workflows/ci.yml) to:
+
+- install the project on Python 3.11
+- compile the source tree
+- run the test suite
+
+For a repeatable local setup with Postgres, use [docker-compose.yml](/Users/sandeepdiddi/Documents/New%20project/docker-compose.yml):
+
+```bash
+docker compose up --build
+```
+
+That stack starts:
+
+- a Postgres 16 container on `localhost:5432`
+- the MCP server container with the Postgres integration enabled
+
 ## First usable tools
 
 With only the workspace integration enabled, the server is already useful. It exposes:

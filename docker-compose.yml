@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: mcp-multi-server-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mcp-server:
+    build:
+      context: .
+    container_name: mcp-multi-server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      MCP_ENVIRONMENT: production
+      MCP_TRANSPORT: stdio
+      MCP_LOG_LEVEL: INFO
+      MCP_WORKSPACE_ENABLED: "false"
+      MCP_POSTGRES_ENABLED: "true"
+      MCP_POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
+      MCP_POSTGRES_VALIDATE_ON_STARTUP: "true"
+      MCP_POSTGRES_STATEMENT_TIMEOUT_MS: "15000"
+      MCP_POSTGRES_DEFAULT_ROW_LIMIT: "200"
+      MCP_POSTGRES_MAX_ROW_LIMIT: "1000"
+
+volumes:
+  postgres_data:
