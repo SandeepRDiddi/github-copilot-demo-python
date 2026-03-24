@@ -1,9 +1,101 @@
-# Python MCP Multi-Integration Scaffold
+# GitHub Copilot Demo for Python Developers
 
-This project is a starter scaffold for running multiple integrations behind one Python MCP server.
-It now includes a production-ready baseline with startup validation, operational metadata, and a first usable local integration so you can run it immediately against your workspace.
+This repository is set up as a practical demo environment for teaching GitHub Copilot to Python developers from scratch.
 
-## How it works
+It gives you two things in one place:
+
+- a real Python codebase you can use for live Copilot demos
+- a structured beginner training pack for hands-on learning
+
+## Demo Story
+
+The simplest way to position this demo in a session is:
+
+> "Copilot is not magic. It becomes useful when developers give it context, constraints, and review. This repo shows that in a real Python project."
+
+## Visual Flow for the Demo
+
+Use this diagram during your intro to explain how the demo works:
+
+```mermaid
+flowchart LR
+    A["Python developer asks Copilot for help"] --> B["Copilot reads code context"]
+    B --> C["Developer adds constraints and intent"]
+    C --> D["Copilot suggests code, tests, or explanations"]
+    D --> E["Developer reviews and edits the suggestion"]
+    E --> F["Pytest and local validation confirm behavior"]
+    F --> G["Team learns faster, with human ownership intact"]
+```
+
+## What You Can Demo Live
+
+### 1. Code explanation
+
+Open [`src/app/server.py`](src/app/server.py) and ask Copilot to explain the control flow for a new Python engineer.
+
+### 2. Test generation
+
+Use [`tests/test_registry.py`](tests/test_registry.py) as a pattern and ask Copilot to draft tests for server metadata functions.
+
+### 3. Safe refactoring
+
+Open a small module like [`src/app/registry.py`](src/app/registry.py) or [`src/app/shared/filesystem.py`](src/app/shared/filesystem.py) and ask Copilot for a readability refactor without behavior change.
+
+### 4. Beginner practice
+
+Move learners into the lab in [`training/lab/README.md`](training/lab/README.md), where they can implement a small Python exercise with Copilot prompts.
+
+## Training Assets
+
+The repo now includes a ready-to-run training pack:
+
+- Workshop guide: [`training/github-copilot-python-workshop.md`](training/github-copilot-python-workshop.md)
+- Prompt cheat sheet: [`training/copilot-python-prompt-cheatsheet.md`](training/copilot-python-prompt-cheatsheet.md)
+- Beginner lab: [`training/lab/README.md`](training/lab/README.md)
+- Starter exercise: [`training/lab/starter/order_summary.py`](training/lab/starter/order_summary.py)
+- Reference implementation: [`training/lab/reference/order_summary_reference.py`](training/lab/reference/order_summary_reference.py)
+- Reference tests: [`training/lab/reference/test_order_summary.py`](training/lab/reference/test_order_summary.py)
+
+## Copilot Skills for the Demo
+
+The repository also includes reusable Copilot customization files so you can demo "skills" instead of one-off prompts:
+
+- Repository instructions: [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
+- Prompt skills library for IDE chat: [`.github/prompts/README.md`](.github/prompts/README.md)
+- CLI custom agents for terminal use: [`.github/agents/README.md`](.github/agents/README.md)
+
+These are useful for showing clients how a team can standardize onboarding, test generation, refactoring, debugging, and code review workflows inside GitHub Copilot.
+
+In prompt-file-aware IDE clients, you can invoke the prompt files with slash commands derived from the filename, for example `/python-code-review`. In GitHub Copilot CLI, use `/agent` and select the matching `python-*` custom agent instead.
+
+## Suggested 90-Minute Session Flow
+
+1. Explain what GitHub Copilot is and is not.
+2. Show inline completion, chat, and edit workflows.
+3. Run a live demo in the existing Python codebase.
+4. Let learners complete the beginner lab.
+5. Close with review habits, guardrails, and prompt patterns.
+
+The full facilitator version lives in [`training/github-copilot-python-workshop.md`](training/github-copilot-python-workshop.md).
+
+## Why This Repo Works Well for Training
+
+- the codebase is real enough to feel credible
+- the Python structure is simple enough for beginners to follow
+- there are tests already in place, which helps teach verification
+- the lab is isolated, so new users can practice safely
+
+## Existing Python App Context
+
+Under the training assets, this is still a working Python MCP server scaffold with:
+
+- one `FastMCP` server process
+- workspace, Postgres, GitHub, and Slack integration modules
+- config-driven integration registration
+- startup validation and server health tools
+- pytest coverage for core behavior
+
+If you want a more technical story during the demo, use this architecture view:
 
 ```mermaid
 flowchart LR
@@ -17,113 +109,22 @@ flowchart LR
     G --> H["AI explains issue, data, or next action"]
 ```
 
-This is the core idea of the project: the AI does not directly touch everything on its own. It goes through one controlled MCP server that applies rules, limits, and safe integrations before returning useful answers.
+## Quick Start
 
-## Real-world example
-
-### Story flow: missing invoices
-
-```text
-Engineer: "A customer says their invoices vanished from the app. We have a tiny billing mystery."
-
-AI Assistant: "Detective mode on. I'll check the code path and the database safely through the MCP server."
-
-MCP Server: "I am the careful sidekick. I can inspect the workspace, look at the Postgres schema, and run read-only queries with limits."
-
-AI Assistant: "Clue #1: I found the invoice loading logic. The app only shows invoices where status = active."
-
-AI Assistant: "Clue #2: I checked Postgres. The customer's invoices exist, but they are marked archived."
-
-Engineer: "So the data is not missing. It is hiding behind a filter like a cat behind a curtain."
-
-AI Assistant: "Exactly. Case closed. This is a business-rule or data-state issue, not a missing-record issue."
-```
-
-### What happened behind the scenes
-
-```mermaid
-sequenceDiagram
-    participant E as Engineer
-    participant A as AI Assistant
-    participant M as MCP Server
-    participant W as Workspace Tools
-    participant P as Postgres Tools
-
-    E->>A: "Why are invoices missing?"
-    A->>M: Request investigation
-    M->>W: Read invoice-related code files
-    W-->>M: Return code context
-    M->>P: Inspect schema and run read-only query
-    P-->>M: Return safe query results
-    M-->>A: Return structured findings
-    A-->>E: Explain root cause and next step
-```
-
-### Why this matters
-
-Without this server, an engineer often has to jump between code, database tools, and manual investigation steps.
-
-With this server:
-
-- the AI can gather code and database context in one place
-- access stays controlled and read-only where it matters
-- the engineer gets a faster explanation, not just raw data
-- the team gets a repeatable troubleshooting pattern instead of one-off scripts
-
-Small details like this matter because engineers remember systems that are both useful and pleasant to use. A little story helps the workflow stick in memory, which makes the technical value easier to explain and easier to adopt.
-
-## What this scaffold gives you
-
-- One `FastMCP` server process
-- A small integration contract so each provider stays isolated
-- Config-driven enable/disable flags per integration
-- Startup validation for critical configuration
-- Safer production defaults for external integrations
-- Server health and status tools for operational visibility
-- A built-in workspace integration with safe local file tools
-- A real read-only Postgres integration for schema discovery and queries
-- Two starter integrations: GitHub and Slack
-- Basic tests around server registration
-
-## Project layout
-
-```text
-src/app/
-  server.py
-  config.py
-  registry.py
-  logging.py
-  types.py
-  integrations/
-    workspace/
-    github/
-    slack/
-  shared/
-tests/
-```
-
-## Quick start
-
-1. Create a virtual environment.
+1. Create a Python 3.11 virtual environment.
 2. Install dependencies:
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-3. Copy the example environment file and fill in any tokens you need:
+3. Copy the example environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-4. Install the package into a Python 3.11 environment:
-
-```bash
-python3.11 -m pip install -e ".[dev]"
-```
-
-5. Run the server:
+4. Run the server:
 
 ```bash
 python3.11 -m app.server
@@ -135,15 +136,25 @@ Or use the installed console script:
 mcp-multi-server
 ```
 
-## CI and local stack
+## Demo Visual Asset
 
-GitHub Actions is configured in [.github/workflows/ci.yml](/Users/sandeepdiddi/Documents/New%20project/.github/workflows/ci.yml) to:
+A standalone animated visual for presentation or social sharing is available at [`linkedin-flow.html`](linkedin-flow.html).
+
+You can open it in a browser and use it as:
+
+- a workshop opening slide
+- a short LinkedIn screen recording
+- a visual explainer before the hands-on lab
+
+## CI and Local Stack
+
+CI is configured in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) to:
 
 - install the project on Python 3.11
 - compile the source tree
 - run the test suite
 
-For a repeatable local setup with Postgres, use [docker-compose.yml](/Users/sandeepdiddi/Documents/New%20project/docker-compose.yml):
+For a repeatable local setup with Postgres, use [`docker-compose.yml`](docker-compose.yml):
 
 ```bash
 docker compose up --build
@@ -154,73 +165,17 @@ That stack starts:
 - a Postgres 16 container on `localhost:5432`
 - the MCP server container with the Postgres integration enabled
 
-## First usable tools
+## Notes for Facilitators
 
-With only the workspace integration enabled, the server is already useful. It exposes:
+- start with a small, obvious Copilot win
+- narrate why you accept or reject a suggestion
+- remind learners that developers own correctness
+- use tests as part of the story, not as an afterthought
 
-- `server_health`
-- `server_status`
-- `list_integrations`
-- `workspace_list_files`
-- `workspace_read_text_file`
+## Verification
 
-Those tools are scoped to `MCP_WORKSPACE_ROOT`, so the server can inspect files inside your chosen project root without wandering outside it.
-
-## Postgres integration
-
-To enable the local Postgres integration:
+The beginner lab reference tests can be run with:
 
 ```bash
-export MCP_POSTGRES_ENABLED=true
-export MCP_POSTGRES_DSN="postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+pytest -q training/lab/reference/test_order_summary.py
 ```
-
-The Postgres tools are:
-
-- `postgres_health`
-- `postgres_list_schemas`
-- `postgres_list_tables`
-- `postgres_describe_table`
-- `postgres_query`
-
-`postgres_query` is intentionally read-only. It only accepts `SELECT`, `WITH`, and `EXPLAIN` statements, wraps results in a bounded `LIMIT`, uses a read-only transaction, and applies a statement timeout.
-
-By default, the Postgres integration also validates connectivity during server startup so broken credentials or a down database fail fast.
-
-## Production baseline
-
-This scaffold now assumes a safer operating model:
-
-- external integrations are disabled by default
-- Postgres is disabled by default until a DSN is configured
-- enabling GitHub or Slack without tokens fails at startup
-- enabling Postgres without a DSN fails at startup
-- workspace access is rooted to one configured directory
-- hidden files can be excluded by default
-- read and listing limits are configurable
-- the server exposes health and registration metadata
-
-## Architecture
-
-Each integration exposes a class with a `register(mcp, context)` method.
-
-- `config.py` loads environment settings
-- `registry.py` decides which integrations are enabled
-- `server.py` creates one `FastMCP` app and registers integrations
-- `shared/` holds reusable helpers
-- `integrations/<name>/` keeps API clients and MCP tools together
-
-## Adding a new integration
-
-1. Create `src/app/integrations/<name>/`.
-2. Add `client.py`, `tools.py`, and `integration.py`.
-3. Implement the integration class using the shared `Integration` protocol.
-4. Register it in `src/app/registry.py`.
-5. Add any new config fields to `src/app/config.py` and `.env.example`.
-
-## Notes
-
-- The workspace integration is the default practical starting point.
-- The GitHub and Slack clients show the shape of external integrations, not a fully exhaustive API wrapper.
-- Use Python 3.11+ for this project. The local default `python3` on some systems may still point to an older interpreter.
-- A minimal [Dockerfile](/Users/sandeepdiddi/Documents/New%20project/Dockerfile) is included for containerized deployment.
