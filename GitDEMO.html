@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Copilot Demo Flow</title>
+  <style>
+    :root {
+      --bg: #f6efe5;
+      --card: rgba(255, 252, 247, 0.86);
+      --ink: #182126;
+      --muted: #54626c;
+      --line: #1f3d3a;
+      --accent: #d96c3f;
+      --accent-2: #2d7a78;
+      --accent-3: #e8b84a;
+      --shadow: 0 24px 60px rgba(24, 33, 38, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(217, 108, 63, 0.16), transparent 28%),
+        radial-gradient(circle at 80% 18%, rgba(45, 122, 120, 0.16), transparent 24%),
+        radial-gradient(circle at 50% 80%, rgba(232, 184, 74, 0.15), transparent 26%),
+        linear-gradient(135deg, #f7f0e7, #f2e7da 48%, #efe4d6);
+      overflow: auto;
+    }
+
+    .stage {
+      width: min(1200px, calc(100vw - 48px));
+      height: auto;
+      margin: 24px auto;
+      padding: 28px;
+      position: relative;
+      overflow: visible;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      background-image:
+        linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.18) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mask-image: radial-gradient(circle at center, black 52%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .title-block {
+      position: relative;
+      width: auto;
+      z-index: 5;
+      animation: none;
+      grid-column: 1 / -1;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 14px;
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      background: rgba(24, 33, 38, 0.08);
+      color: var(--line);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(48px, 6.4vw, 72px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: none;
+    }
+
+    .subtitle {
+      margin-top: 20px;
+      font-size: clamp(20px, 2.2vw, 28px);
+      line-height: 1.3;
+      color: var(--muted);
+      max-width: none;
+    }
+
+    .panel {
+      position: relative;
+      border-radius: 30px;
+      padding: 28px 30px;
+      background: var(--card);
+      border: 1px solid rgba(31, 61, 58, 0.08);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      z-index: 4;
+      min-height: 0;
+      width: auto;
+    }
+
+    .problem {
+      animation: none;
+    }
+
+    .engineer {
+      animation: none;
+    }
+
+    .server {
+      animation: none;
+    }
+
+    .workspace {
+      animation: none;
+    }
+
+    .postgres {
+      animation: none;
+    }
+
+    .outcome {
+      animation: none;
+      grid-column: 1 / -1;
+    }
+
+    .label {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      background: rgba(31, 61, 58, 0.08);
+      color: var(--line);
+    }
+
+    .problem .label { background: rgba(217, 108, 63, 0.14); color: #9d4a24; }
+    .server .label { background: rgba(45, 122, 120, 0.14); color: #235f5d; }
+    .workspace .label { background: rgba(45, 122, 120, 0.14); color: #235f5d; }
+    .postgres .label { background: rgba(232, 184, 74, 0.2); color: #896412; }
+    .outcome .label { background: rgba(24, 33, 38, 0.08); color: var(--line); }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 3.1vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 21px;
+      line-height: 1.4;
+    }
+
+    .chat {
+      position: relative;
+      padding-left: 78px;
+    }
+
+    .avatar {
+      position: absolute;
+      left: 0;
+      top: 2px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      background: linear-gradient(135deg, #1f3d3a, #2d7a78);
+      color: white;
+      box-shadow: 0 12px 24px rgba(31, 61, 58, 0.2);
+    }
+
+    .chat p strong {
+      color: var(--ink);
+    }
+
+    .mini-list {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mini-list li {
+      font-size: clamp(19px, 1.7vw, 24px);
+      color: var(--muted);
+      margin-top: 10px;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    .mini-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .mini-list.alt li::before {
+      background: var(--accent-2);
+    }
+
+    .mini-list.gold li::before {
+      background: var(--accent-3);
+    }
+
+    svg.flow {
+      display: none;
+    }
+
+    .path-base {
+      fill: none;
+      stroke: rgba(31, 61, 58, 0.18);
+      stroke-width: 7;
+      stroke-linecap: round;
+    }
+
+    .path-glow {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 16 22;
+      filter: drop-shadow(0 0 14px rgba(217, 108, 63, 0.3));
+      animation: move 5s linear infinite;
+    }
+
+    .orange { stroke: var(--accent); }
+    .teal { stroke: var(--accent-2); }
+    .gold { stroke: var(--accent-3); }
+
+    .spark {
+      fill: white;
+      stroke-width: 6;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.85));
+    }
+
+    .spark.orange { stroke: var(--accent); }
+    .spark.teal { stroke: var(--accent-2); }
+    .spark.gold { stroke: var(--accent-3); }
+
+    .caption {
+      position: relative;
+      font-size: clamp(19px, 1.7vw, 24px);
+      color: rgba(24, 33, 38, 0.7);
+      z-index: 5;
+      animation: none;
+      text-align: center;
+      grid-column: 1 / -1;
+    }
+
+    @keyframes move {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: -180; }
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (min-width: 1501px) and (min-height: 1101px) {
+      body {
+        overflow: hidden;
+      }
+
+      .stage {
+        width: 1400px;
+        height: 1080px;
+        margin: 0 auto;
+        padding: 0;
+        display: block;
+        overflow: hidden;
+      }
+
+      .grain,
+      svg.flow {
+        display: block;
+      }
+
+      .title-block {
+        position: absolute;
+        left: 60px;
+        top: 48px;
+        width: 480px;
+        animation: rise 900ms ease-out both;
+      }
+
+      /* Smaller h1 → 3 lines at 480px width → ~130px tall, title total ~280px */
+      h1 {
+        font-size: 44px;
+        max-width: 480px;
+      }
+
+      .subtitle {
+        font-size: 18px;
+        max-width: 480px;
+        margin-top: 12px;
+      }
+
+      /* Reduce panel font sizes so content fits within fixed positions */
+      .panel {
+        position: absolute;
+        padding: 22px 24px;
+      }
+
+      .panel h2 {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+
+      .panel p {
+        font-size: 16px;
+        line-height: 1.35;
+      }
+
+      .mini-list {
+        margin-top: 12px;
+      }
+
+      .mini-list li {
+        font-size: 15px;
+        margin-top: 7px;
+      }
+
+      .label {
+        font-size: 13px;
+        padding: 6px 12px;
+        margin-bottom: 10px;
+      }
+
+      /* Left column: title (left=60, width=480, right=540 stage)
+         Problem and engineer are below the title */
+      .problem {
+        left: 60px;
+        top: 310px;
+        width: 275px;
+        animation: floaty 7s ease-in-out infinite;
+      }
+
+      .engineer {
+        left: 60px;
+        top: 560px;
+        width: 355px;
+        animation: floaty 6.4s ease-in-out infinite 0.6s;
+      }
+
+      /* Center column: left=560 (20px gap from title right=540)
+         width=360 → right=920, 20px gap from right column left=940 */
+      .server {
+        left: 560px;
+        top: 220px;
+        width: 360px;
+        animation: floaty 6.8s ease-in-out infinite 0.2s;
+      }
+
+      .outcome {
+        left: 560px;
+        top: 580px;
+        width: 360px;
+        animation: rise 1200ms ease-out both 500ms;
+      }
+
+      /* Right column: left=940, width=280 → right=1220 (stage) */
+      .workspace {
+        left: 940px;
+        top: 120px;
+        width: 280px;
+        animation: floaty 7.1s ease-in-out infinite 0.8s;
+      }
+
+      .postgres {
+        left: 940px;
+        top: 420px;
+        width: 280px;
+        animation: floaty 6.6s ease-in-out infinite 1s;
+      }
+
+      .caption {
+        position: absolute;
+        right: 60px;
+        bottom: 28px;
+        font-size: 20px;
+        animation: rise 1300ms ease-out both 700ms;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="grain"></div>
+
+    <div class="title-block">
+      <div class="eyebrow">GitHub Copilot Demo</div>
+      <h1>From blank page to confident Python developer</h1>
+      <div class="subtitle">
+        Built to show how Python teams can learn GitHub Copilot step by step with real code, prompts, review, and tests.
+      </div>
+    </div>
+
+    <svg class="flow" viewBox="0 0 1400 1080" aria-hidden="true">
+      <!-- problem right-center (335,410) → server left-center (560,350) -->
+      <path class="path-base" d="M 335 410 C 448 410, 448 350, 560 350" />
+      <path class="path-glow orange" d="M 335 410 C 448 410, 448 350, 560 350" />
+
+      <!-- engineer right-center (415,635) → server left-lower (560,480) -->
+      <path class="path-base" d="M 415 635 C 488 635, 488 480, 560 480" />
+      <path class="path-glow teal" d="M 415 635 C 488 635, 488 480, 560 480" style="animation-duration:4.6s" />
+
+      <!-- server right-upper (920,330) → workspace left-center (940,240) -->
+      <path class="path-base" d="M 920 330 C 930 285, 930 240, 940 240" />
+      <path class="path-glow teal" d="M 920 330 C 930 285, 930 240, 940 240" style="animation-duration:4.8s" />
+
+      <!-- server right-lower (920,440) → postgres left-center (940,540) -->
+      <path class="path-base" d="M 920 440 C 930 490, 930 540, 940 540" />
+      <path class="path-glow gold" d="M 920 440 C 930 490, 930 540, 940 540" style="animation-duration:5.2s" />
+
+      <!-- workspace right (1220,240) → outcome right (920,680) -->
+      <path class="path-base" d="M 1220 240 C 1270 400, 1170 650, 920 660" />
+      <path class="path-glow orange" d="M 1220 240 C 1270 400, 1170 650, 920 660" style="animation-duration:4.4s" />
+
+      <!-- postgres right (1220,540) → outcome right (920,680) -->
+      <path class="path-base" d="M 1220 540 C 1260 580, 1110 670, 920 675" />
+      <path class="path-glow teal" d="M 1220 540 C 1260 580, 1110 670, 920 675" style="animation-duration:5.4s" />
+
+      <circle class="spark orange" r="9">
+        <animateMotion dur="5s" repeatCount="indefinite" path="M 335 410 C 448 410, 448 350, 560 350" />
+      </circle>
+      <circle class="spark teal" r="9">
+        <animateMotion dur="4.6s" repeatCount="indefinite" path="M 415 635 C 488 635, 488 480, 560 480" />
+      </circle>
+      <circle class="spark teal" r="9">
+        <animateMotion dur="4.8s" repeatCount="indefinite" path="M 920 330 C 930 285, 930 240, 940 240" />
+      </circle>
+      <circle class="spark gold" r="9">
+        <animateMotion dur="5.2s" repeatCount="indefinite" path="M 920 440 C 930 490, 930 540, 940 540" />
+      </circle>
+      <circle class="spark orange" r="9">
+        <animateMotion dur="4.4s" repeatCount="indefinite" path="M 1220 240 C 1270 400, 1170 650, 920 660" />
+      </circle>
+      <circle class="spark teal" r="9">
+        <animateMotion dur="5.4s" repeatCount="indefinite" path="M 1220 540 C 1260 580, 1110 670, 920 675" />
+      </circle>
+    </svg>
+
+    <section class="panel problem">
+      <div class="label">Problem</div>
+      <h2>New users do not know where to start</h2>
+      <p>Many Python developers open Copilot, try one vague prompt, and leave unconvinced.</p>
+    </section>
+
+    <section class="panel engineer">
+      <div class="chat">
+        <div class="avatar">E</div>
+        <div class="label">Learner</div>
+        <p><strong>"Can Copilot really help me write Python?"</strong> Show me a workflow I can trust.</p>
+      </div>
+    </section>
+
+    <section class="panel server">
+      <div class="label">Copilot Workflow</div>
+      <h2>Prompt, generate, review, verify</h2>
+      <p>The demo teaches one repeatable workflow instead of treating Copilot like auto-pilot.</p>
+      <ul class="mini-list alt">
+        <li>Give context</li>
+        <li>Add constraints</li>
+        <li>Review every suggestion</li>
+      </ul>
+    </section>
+
+    <section class="panel workspace">
+      <div class="label">Python Repo</div>
+      <h2>Real code context</h2>
+      <p>Learners see Copilot work inside a live Python project, not a toy one-liner.</p>
+      <ul class="mini-list alt">
+        <li>Explain files</li>
+        <li>Draft functions and tests</li>
+      </ul>
+    </section>
+
+    <section class="panel postgres">
+      <div class="label">Hands-on Lab</div>
+      <h2>Safe beginner practice</h2>
+      <p>A small Python exercise lets new users practice prompts, edits, and pytest-based validation.</p>
+      <ul class="mini-list gold">
+        <li>Implement starter functions</li>
+        <li>Validate with tests</li>
+      </ul>
+    </section>
+
+    <section class="panel outcome">
+      <div class="label">Outcome</div>
+      <h2>Faster onboarding, better prompts</h2>
+      <p>
+        Learners leave knowing how to ask better questions, review Copilot output, and use Python tests to build confidence.
+      </p>
+    </section>
+
+    <div class="caption">Use this as a workshop opener, README visual companion, or short social demo clip.</div>
+  </div>
+</body>
+</html>
