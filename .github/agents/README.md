@@ -28,3 +28,4 @@ You can also ask Copilot to use an agent by name in a normal prompt, for example
 - `python-lab-coach.agent.md` mirrors `python-lab-coach.prompt.md`
 - `python-prompt-improver.agent.md` mirrors `python-prompt-improver.prompt.md`
 - `python-feature-starter.agent.md` mirrors `python-feature-starter.prompt.md`
+- `python-oop-pep8-review.agent.md` mirrors `python-oop-pep8-review.prompt.md`

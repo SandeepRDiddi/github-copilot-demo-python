@@ -51,6 +51,7 @@ The repo now includes a ready-to-run training pack:
 
 - Workshop guide: [`training/github-copilot-python-workshop.md`](training/github-copilot-python-workshop.md)
 - Prompt cheat sheet: [`training/copilot-python-prompt-cheatsheet.md`](training/copilot-python-prompt-cheatsheet.md)
+- OOP and PEP 8 review demo: [`training/oop_demo/README.md`](training/oop_demo/README.md)
 - Beginner lab: [`training/lab/README.md`](training/lab/README.md)
 - Starter exercise: [`training/lab/starter/order_summary.py`](training/lab/starter/order_summary.py)
 - Reference implementation: [`training/lab/reference/order_summary_reference.py`](training/lab/reference/order_summary_reference.py)

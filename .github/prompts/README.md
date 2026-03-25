@@ -22,6 +22,8 @@ This folder contains reusable GitHub Copilot prompt files that you can demo as t
   Rewrites weak prompts into stronger ones.
 - `python-feature-starter.prompt.md`
   Turns a feature request into a small Copilot-assisted plan.
+- `python-oop-pep8-review.prompt.md`
+  Reviews a Python file for OOP design issues, PEP 8 quality, and the safest fixes.
 
 ## How to Demo Them
 
